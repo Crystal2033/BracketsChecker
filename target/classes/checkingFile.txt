@@ -1,5 +1,5 @@
-public void setConfigFile(String configFileName) throws ParsingError, IOException, JSONException {
+public void setConfigFile(String configFileName) throws ParsingError, IOException, JSONException |
         ConfigParser configParser = new ConfigParser( configFileName);
         bracketsMap = configParser.getBracketsMap();
         stringBuilder = new StringBuilder();
-    }
+    ||

@@ -1,1 +1,1 @@
-{"bracket":[{"left":"[","right":"]"},{"left":"{","right":"}"}, {"left":"[","right":")"}]}
+{"bracket":[{"left":"[","right":"]"},{"left":"{","right":"}"}, {"left":"(","right":")"}]}
