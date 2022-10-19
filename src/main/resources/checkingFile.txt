@@ -1,1 +1,5 @@
-[some(one{1|!value|2}?jar))none]
+public void setConfigFile(String configFileName) throws ParsingError, IOException, JSONException {
+        ConfigParser configParser = new ConfigParser(configFileName);
+        bracketsMap = configParser.getBracketsMap();
+        stringBuilder = new StringBuilder();
+    }

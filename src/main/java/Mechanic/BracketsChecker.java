@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class BracketsChecker {
     private Map<String, Pair<String, String>> bracketsMap;
-    private int lineCounter = 0;
+    private int lineCounter = 1;
     private StringBuilder stringBuilder;
     private final ArrayDeque<Pair<String, Pair<Integer, Integer>>> stackBracketsAndPos = new ArrayDeque<>();
 
@@ -42,12 +42,12 @@ public class BracketsChecker {
         for (int i = 0; i < textLine.length(); i++){
             String currentCharInString = String.valueOf(textLine.charAt(i));
             if(bracketsMap.containsKey(currentCharInString)){
-                symbolIsBracketCase(currentCharInString, i);
+                symbolIsBracketCase(currentCharInString, i+1);
             }
         }
     }
 
-    private void symbolIsBracketCase(String currentBracket,int symbolPos) throws BracketPositionError{
+    private void symbolIsBracketCase(String currentBracket, int symbolPos) throws BracketPositionError{
         Pair<String, String> directionAndPairBracket = bracketsMap.get(currentBracket);
         if(directionAndPairBracket.first.equals(SettingNames.bothBracketJSONKey)) {
             bothDirectionsBracketCase(directionAndPairBracket, currentBracket, symbolPos);
@@ -81,6 +81,7 @@ public class BracketsChecker {
         stackBracketsAndPos.push(Pair.create(currentBracket, Pair.create(lineCounter, symbolPos)));
     }
 
+
     private void rightDirectionBracketCase(Pair<String, String> directionAndPairBracket, int symbolPos) throws BracketPositionError {
         if(stackBracketsAndPos.isEmpty()){
             throw new BracketPositionError(lineCounter, symbolPos);
@@ -92,8 +93,6 @@ public class BracketsChecker {
             return;
         }
 
-        Pair<Integer, Integer> errorBracketPosition = stackBracketsAndPos.peekFirst().second;
-        throw new BracketPositionError("Not found pair bracket. Opened is on: ",
-                errorBracketPosition.first, errorBracketPosition.second);
+        throw new BracketPositionError("Not found pair bracket. Opened is on: ", lineCounter, symbolPos);
     }
 }
