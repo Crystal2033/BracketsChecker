@@ -42,7 +42,7 @@ public class ConfigParser {
 
     private void checkExistInMapAndInsert(String bracketJSONValue, Pair<String, String> directionAndPairBracket) throws ParsingError {
         if(bracketsMap.containsValue(Pair.create(directionAndPairBracket.first, directionAndPairBracket.second))){
-            throw new ParsingError(this.fileName);
+            throw new ParsingError("Bracket " + directionAndPairBracket.second + " already exists in config file. ", this.fileName);
         }
         if(bracketsMap.containsKey(bracketJSONValue)){
             Pair<String, String> bracketPairValue = bracketsMap.get(bracketJSONValue);
