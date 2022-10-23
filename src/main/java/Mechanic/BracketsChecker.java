@@ -4,6 +4,8 @@ import Exceptions.BracketPositionError;
 import Exceptions.ParsingError;
 import MyCollections.Pair;
 import Settings.SettingNames;
+import models.BracketInfo;
+import models.Direction;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -11,7 +13,7 @@ import java.util.ArrayDeque;
 import java.util.Map;
 
 public class BracketsChecker {
-    private Map<String, Pair<String, String>> bracketsMap;
+    private Map<String, BracketInfo> bracketsMap;
     private int lineCounter = 1;
     private StringBuilder stringBuilder;
     private final ArrayDeque<Pair<String, Pair<Integer, Integer>>> stackBracketsAndPos = new ArrayDeque<>();
@@ -29,7 +31,7 @@ public class BracketsChecker {
             }
 
             while(fileDataGetter.hasNextLine()){
-                checkCorrectnessOrException(fileDataGetter.getNextLine());
+                checkBracketsCorrectnessOrException(fileDataGetter.getNextLine());
                 lineCounter++;
             }
             if(!stackBracketsAndPos.isEmpty()){
@@ -38,7 +40,7 @@ public class BracketsChecker {
             }
     }
 
-    private void checkCorrectnessOrException(String textLine) throws BracketPositionError{
+    private void checkBracketsCorrectnessOrException(String textLine) throws BracketPositionError{
         for (int i = 0; i < textLine.length(); i++){
             String currentCharInString = String.valueOf(textLine.charAt(i));
             if(bracketsMap.containsKey(currentCharInString)){
@@ -48,29 +50,30 @@ public class BracketsChecker {
     }
 
     private void symbolIsBracketCase(String currentBracket, int symbolPos) throws BracketPositionError{
-        Pair<String, String> directionAndPairBracket = bracketsMap.get(currentBracket);
-        if(directionAndPairBracket.first.equals(SettingNames.bothBracketJSONKey)) {
-            bothDirectionsBracketCase(directionAndPairBracket, currentBracket, symbolPos);
+        //Pair<String, String> directionAndPairBracket = bracketsMap.get(currentBracket);
+        BracketInfo currentBracketInfo = bracketsMap.get(currentBracket);
+        if(currentBracketInfo.getDirection().equals(Direction.BOTH)) {
+            bothDirectionsBracketCase(currentBracketInfo, currentBracket, symbolPos);
             return;
         }
 
-        if(directionAndPairBracket.first.equals(SettingNames.leftBracketJSONKey)){
+        if(currentBracketInfo.getDirection().equals(Direction.LEFT)){
             leftDirectionBracketCase(currentBracket, symbolPos);
             return;
         }
 
-        rightDirectionBracketCase(directionAndPairBracket, symbolPos);
+        rightDirectionBracketCase(currentBracketInfo, symbolPos);
 
     }
 
-    private void bothDirectionsBracketCase(Pair<String, String> directionAndPairBracket, String currentBracket, int symbolPos){
+    private void bothDirectionsBracketCase(BracketInfo currentBracketInfo, String currentBracket, int symbolPos){
             if(stackBracketsAndPos.isEmpty()){
                 stackBracketsAndPos.push(Pair.create(currentBracket, Pair.create(lineCounter, symbolPos)));
                 return;
             }
 
             String prevStackBracket = stackBracketsAndPos.peekFirst().first;
-            if(prevStackBracket.equals(directionAndPairBracket.second)){
+            if(prevStackBracket.equals(currentBracketInfo.getPairBracket())){
                 stackBracketsAndPos.pop();
                 return;
             }
@@ -82,13 +85,13 @@ public class BracketsChecker {
     }
 
 
-    private void rightDirectionBracketCase(Pair<String, String> directionAndPairBracket, int symbolPos) throws BracketPositionError {
+    private void rightDirectionBracketCase(BracketInfo bracketInfo, int symbolPos) throws BracketPositionError {
         if(stackBracketsAndPos.isEmpty()){
             throw new BracketPositionError(lineCounter, symbolPos);
         }
 
         String prevStackBracket = stackBracketsAndPos.peekFirst().first;
-        if(prevStackBracket.equals(directionAndPairBracket.second)){
+        if(prevStackBracket.equals(bracketInfo.getPairBracket())){
             stackBracketsAndPos.pop();
             return;
         }

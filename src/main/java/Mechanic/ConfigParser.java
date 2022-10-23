@@ -3,6 +3,8 @@ package Mechanic;
 import Exceptions.ParsingError;
 import MyCollections.Pair;
 import Settings.SettingNames;
+import models.BracketInfo;
+import models.Direction;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +15,7 @@ import java.util.Map;
 
 public class ConfigParser {
     private final FileDataGetter fileDataGetter;
-    private final Map<String, Pair<String, String>> bracketsMap = new HashMap<>();
+    private final Map<String, BracketInfo> bracketsMap = new HashMap<>();
     private final String fileName;
     private JSONArray bracketsJSONArray;
 
@@ -22,7 +24,7 @@ public class ConfigParser {
         fileName = configFileName;
     }
 
-    public Map<String, Pair<String, String>> getBracketsMap() throws IOException, JSONException, ParsingError {
+    public Map<String, BracketInfo> getBracketsMap() throws IOException, JSONException, ParsingError {
         StringBuilder stringBuilder = new StringBuilder();
 
         while(fileDataGetter.hasNextLine()){
@@ -40,25 +42,28 @@ public class ConfigParser {
         }
     }
 
-    private void checkExistInMapAndInsert(String bracketJSONValue, Pair<String, String> directionAndPairBracket) throws ParsingError {
-        if(bracketsMap.containsValue(Pair.create(directionAndPairBracket.first, directionAndPairBracket.second))){
-            throw new ParsingError("Bracket " + directionAndPairBracket.second + " already exists in config file. ", this.fileName);
-        }
-        if(bracketsMap.containsKey(bracketJSONValue)){
-            Pair<String, String> bracketPairValue = bracketsMap.get(bracketJSONValue);
-            if(!bracketPairValue.first.equals(directionAndPairBracket.first)){
-                bracketsMap.put(bracketJSONValue, Pair.create(SettingNames.bothBracketJSONKey, bracketJSONValue));
+    private void checkExistInMapAndInsert(String bracketJSONValue, BracketInfo bracketInfo) throws ParsingError {
+//        if(bracketsMap.containsValue(bracketInfo)){
+//            throw new ParsingError("Bracket " + bracketInfo.getPairBracket() + " already exists in config file. ", this.fileName);
+//        }
+
+        if(bracketsMap.containsKey(bracketJSONValue)){ // left: |, right: |
+            BracketInfo foundedBracketInfo =  bracketsMap.get(bracketJSONValue);
+
+            if(!foundedBracketInfo.getDirection().equals(bracketInfo.getDirection()) && bracketJSONValue.equals(foundedBracketInfo.getPairBracket())){
+                bracketsMap.put(bracketJSONValue, new BracketInfo(Direction.BOTH, bracketJSONValue));
                 return;
             }
+            throw new ParsingError("Bracket " + bracketJSONValue + " already exists in config file. ", this.fileName);
         }
-        bracketsMap.put(bracketJSONValue, directionAndPairBracket);
+        bracketsMap.put(bracketJSONValue, bracketInfo);
     }
 
     private void createNewJsonPairByPos(int i) throws ParsingError {
         String leftBracketJSONValue = bracketsJSONArray.getJSONObject(i).getString(SettingNames.leftBracketJSONKey);
         String rightBracketJSONValue = bracketsJSONArray.getJSONObject(i).getString(SettingNames.rightBracketJSONKey);
 
-        checkExistInMapAndInsert(leftBracketJSONValue, Pair.create(SettingNames.leftBracketJSONKey, rightBracketJSONValue));
-        checkExistInMapAndInsert(rightBracketJSONValue, Pair.create(SettingNames.rightBracketJSONKey, leftBracketJSONValue));
+        checkExistInMapAndInsert(leftBracketJSONValue, new BracketInfo(Direction.LEFT, rightBracketJSONValue));
+        checkExistInMapAndInsert(rightBracketJSONValue, new BracketInfo(Direction.RIGHT, leftBracketJSONValue));
     }
 }
