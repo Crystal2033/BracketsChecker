@@ -3,8 +3,8 @@ package Exceptions;
 import Colors.ConsoleColors;
 
 public class BracketPositionError extends Exception{
-    private int errorPosition = -1;
-    private int errorLine = -1;
+    private final int errorPosition;
+    private final int errorLine;
     private final String errorMessage;
 
     public BracketPositionError(String errorMessage, int errorLine, int errorPos){

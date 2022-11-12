@@ -15,12 +15,16 @@ public class BracketInfo {
         return direction;
     }
 
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
     public String getPairBracket() {
         return pairBracket;
     }
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    public void setPairBracket(String pairBracket) {
+        this.pairBracket = pairBracket;
     }
 
     @Override
@@ -34,9 +38,5 @@ public class BracketInfo {
     @Override
     public int hashCode() {
         return Objects.hash(direction, pairBracket);
-    }
-
-    public void setPairBracket(String pairBracket) {
-        this.pairBracket = pairBracket;
     }
 }
